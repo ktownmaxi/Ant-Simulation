@@ -95,7 +95,7 @@ class Grid:
             # Iterate over a Quadrat with dx radius and dy radius
             for row in range(row_center - radius, row_center + radius + 1):
                 for col in range(col_center - radius, col_center + radius + 1):
-                    # Prüfe, ob (row, col) im Gitter liegt
+                    # Check if point in board
                     if 0 <= row < self.rows and 0 <= col < self.cols:
                         # Check if cell is in circle radius
                         if (row - row_center) ** 2 + (col - col_center) ** 2 <= radius ** 2:
@@ -115,8 +115,9 @@ class Grid:
         # Iterate over a Quadrat with dx radius and dy radius
         for row in range(row_center - radius, row_center + radius + 1):
             for col in range(col_center - radius, col_center + radius + 1):
-                # Prüfe, ob (row, col) im Gitter liegt
+                # Check if point in board
                 if 0 <= row < self.rows and 0 <= col < self.cols:
                     # Check if cell is in circle radius
                     if (row - row_center) ** 2 + (col - col_center) ** 2 <= radius ** 2:
-                        self.numpy_grid[row, col] = 2
+                        if self.numpy_grid[row, col] != 1:
+                            self.numpy_grid[row, col] = 2
