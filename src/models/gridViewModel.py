@@ -1,11 +1,12 @@
 import pygame
 import numpy as np
 
+from src.models.gridModel import GridModel
 
-class Grid:
+
+class GridViewModel(GridModel):
     def __init__(self, rows, cols, cell_size, line_color, colony_color, food_color):
-        self.rows = rows
-        self.cols = cols
+        super().__init__(rows, cols)
         self.cell_size = cell_size
         self.line_color = line_color
 
@@ -21,8 +22,6 @@ class Grid:
 
         self.already_marked_circle = False
 
-        self.numpy_grid = self.build_numpy_model()  # NumPy model to compute data
-
     def build_numpy_model(self):
         grid_model = np.zeros((self.rows, self.cols), dtype=int)
         return grid_model
@@ -35,15 +34,15 @@ class Grid:
         # render all colored cells
         for row in range(self.rows):
             for col in range(self.cols):
-                if self.numpy_grid[row, col] == 1 or 2:
+                if self.data[row, col] == 1 or 2:
                     cell_x = self.offset_x + col * self.cell_size * self.zoom_factor
                     cell_y = self.offset_y + row * self.cell_size * self.zoom_factor
                     cell_w = self.cell_size * self.zoom_factor
                     cell_h = self.cell_size * self.zoom_factor
 
-                    if self.numpy_grid[row, col] == 1:
+                    if self.data[row, col] == 1:
                         pygame.draw.rect(surface, self.colony_color, (cell_x, cell_y, cell_w, cell_h))
-                    elif self.numpy_grid[row, col] == 2:
+                    elif self.data[row, col] == 2:
                         pygame.draw.rect(surface, self.food_color, (cell_x, cell_y, cell_w, cell_h))
 
         # horizontal lines
@@ -99,7 +98,7 @@ class Grid:
                     if 0 <= row < self.rows and 0 <= col < self.cols:
                         # Check if cell is in circle radius
                         if (row - row_center) ** 2 + (col - col_center) ** 2 <= radius ** 2:
-                            self.numpy_grid[row, col] = 1
+                            self.data[row, col] = 1
 
             self.already_marked_circle = True
 
@@ -119,5 +118,5 @@ class Grid:
                 if 0 <= row < self.rows and 0 <= col < self.cols:
                     # Check if cell is in circle radius
                     if (row - row_center) ** 2 + (col - col_center) ** 2 <= radius ** 2:
-                        if self.numpy_grid[row, col] != 1:
-                            self.numpy_grid[row, col] = 2
+                        if self.data[row, col] != 1:
+                            self.data[row, col] = 2

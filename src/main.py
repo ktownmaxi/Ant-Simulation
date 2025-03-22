@@ -1,7 +1,9 @@
 import pygame
 import sys
 
-from grid import Grid
+from src.models.gridNavigationModel import GridNavigationModel
+from src.models.gridViewModel import GridViewModel
+from models.modelHelper import sync_model_data
 
 width, height = 1920, 1080
 
@@ -23,8 +25,9 @@ pygame.init()
 screen = pygame.display.set_mode((width, height))
 pygame.display.set_caption("Ant-Simulation")
 
-# instantiate grid instance
-grid = Grid(rows, cols, cell_size, line_color, colony_color, food_color)
+# instantiate viewModel instance
+view_model = GridViewModel(rows, cols, cell_size, line_color, colony_color, food_color)
+navigation_model = GridNavigationModel(view_model)
 
 dragging = False
 last_mouse_pos = (0, 0)
@@ -40,9 +43,9 @@ while True:
                 dragging = True
                 last_mouse_pos = event.pos
             elif event.button == 4:  # Scroll up => Zoom in
-                grid.zoom(event.pos, zoom_in=True)
+                view_model.zoom(event.pos, zoom_in=True)
             elif event.button == 5:  # Scroll down => Zoom out
-                grid.zoom(event.pos, zoom_in=False)
+                view_model.zoom(event.pos, zoom_in=False)
 
         elif event.type == pygame.MOUSEBUTTONUP:
             if event.button == 2:
@@ -51,15 +54,17 @@ while True:
         elif event.type == pygame.MOUSEMOTION and dragging:
             dx = event.pos[0] - last_mouse_pos[0]
             dy = event.pos[1] - last_mouse_pos[1]
-            grid.pan(dx, dy)
+            view_model.pan(dx, dy)
             last_mouse_pos = event.pos
 
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_h:
-                grid.mark_colony(pygame.mouse.get_pos(), colony_radius)
+                view_model.mark_colony(pygame.mouse.get_pos(), colony_radius)
             if event.key == pygame.K_g:
-                grid.mark_food(pygame.mouse.get_pos(), food_radius)
+                view_model.mark_food(pygame.mouse.get_pos(), food_radius)
+
+            sync_model_data(view_model, navigation_model)
 
     screen.fill(bg_color)
-    grid.draw(screen)
+    view_model.draw(screen)
     pygame.display.flip()
