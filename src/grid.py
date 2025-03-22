@@ -16,7 +16,7 @@ class Grid:
         self.normal_width = 1
         self.outer_width = 3
 
-        self.alreadyMarkedCircle = False
+        self.already_marked_circle = False
 
         self.numpy_grid = self.build_numpy_model()  # NumPy model to compute data
 
@@ -84,7 +84,7 @@ class Grid:
         col_center = int((mouse_x - self.offset_x) / (self.cell_size * self.zoom_factor))
         row_center = int((mouse_y - self.offset_y) / (self.cell_size * self.zoom_factor))
 
-        if not self.alreadyMarkedCircle:
+        if not self.already_marked_circle:
             # Iterate over a Quadrat with dx radius and dy radius
             for row in range(row_center - radius, row_center + radius + 1):
                 for col in range(col_center - radius, col_center + radius + 1):
@@ -94,4 +94,4 @@ class Grid:
                         if (row - row_center) ** 2 + (col - col_center) ** 2 <= radius ** 2:
                             self.numpy_grid[row, col] = 1
 
-            self.alreadyMarkedCircle = True
+            self.already_marked_circle = True
