@@ -10,6 +10,9 @@ rows, cols = 150, 150
 cell_size = 15
 line_color = (65, 65, 65)
 
+# Colony settings
+colonyRadius = 4
+
 # Colors
 bg_color = (79, 79, 79)
 
@@ -47,6 +50,11 @@ while True:
             dy = event.pos[1] - last_mouse_pos[1]
             grid.pan(dx, dy)
             last_mouse_pos = event.pos
+
+        elif event.type == pygame.KEYDOWN:
+            # Drücke "h", um die Zelle an der aktuellen Mausposition grün zu färben
+            if event.key == pygame.K_h:
+                grid.mark_circle(pygame.mouse.get_pos(), colonyRadius)
 
     screen.fill(bg_color)
     grid.draw(screen)
