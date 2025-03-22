@@ -3,11 +3,14 @@ import numpy as np
 
 
 class Grid:
-    def __init__(self, rows, cols, cell_size, line_color):
+    def __init__(self, rows, cols, cell_size, line_color, colony_color, food_color):
         self.rows = rows
         self.cols = cols
         self.cell_size = cell_size
         self.line_color = line_color
+
+        self.colony_color = colony_color
+        self.food_color = food_color
 
         self.zoom_factor = 0.4
         self.min_zoom, self.max_zoom = 0.25, 7.5
@@ -29,18 +32,21 @@ class Grid:
         grid_width = self.cols * self.cell_size * self.zoom_factor
         grid_height = self.rows * self.cell_size * self.zoom_factor
 
-        # Zuerst alle gefärbten Zellen rendern
+        # render all colored cells
         for row in range(self.rows):
             for col in range(self.cols):
-                if self.numpy_grid[row, col] == 1:
-                    # Berechne die Position und Größe der Zelle
+                if self.numpy_grid[row, col] == 1 or 2:
                     cell_x = self.offset_x + col * self.cell_size * self.zoom_factor
                     cell_y = self.offset_y + row * self.cell_size * self.zoom_factor
                     cell_w = self.cell_size * self.zoom_factor
                     cell_h = self.cell_size * self.zoom_factor
-                    pygame.draw.rect(surface, (0, 255, 0), (cell_x, cell_y, cell_w, cell_h))
 
-        # Zeichne horizontale Linien
+                    if self.numpy_grid[row, col] == 1:
+                        pygame.draw.rect(surface, self.colony_color, (cell_x, cell_y, cell_w, cell_h))
+                    elif self.numpy_grid[row, col] == 2:
+                        pygame.draw.rect(surface, self.food_color, (cell_x, cell_y, cell_w, cell_h))
+
+        # horizontal lines
         for row in range(self.rows + 1):
             y = self.offset_y + row * self.cell_size * self.zoom_factor
             start_x = self.offset_x
@@ -48,7 +54,7 @@ class Grid:
             lw = self.outer_width if row == 0 or row == self.rows else self.normal_width
             pygame.draw.line(surface, self.line_color, (start_x, y), (end_x, y), lw)
 
-        # Zeichne vertikale Linien
+        # vertical lines
         for col in range(self.cols + 1):
             x = self.offset_x + col * self.cell_size * self.zoom_factor
             start_y = self.offset_y
@@ -76,9 +82,10 @@ class Grid:
         self.offset_x += dx
         self.offset_y += dy
 
-    def mark_circle(self, mouse_pos, radius):
+    def mark_colony(self, mouse_pos, radius):
         """
         Marks a circle of radius radius on the grid by placing 1s in the numpy model
+        Used to place the colony
         """
         mouse_x, mouse_y = mouse_pos
         col_center = int((mouse_x - self.offset_x) / (self.cell_size * self.zoom_factor))
@@ -95,3 +102,21 @@ class Grid:
                             self.numpy_grid[row, col] = 1
 
             self.already_marked_circle = True
+
+    def mark_food(self, mouse_pos, radius):
+        """
+        Marks a circle of radius radius on the grid by placing 1s in the numpy model
+        Used to place the food for the colony
+        """
+        mouse_x, mouse_y = mouse_pos
+        col_center = int((mouse_x - self.offset_x) / (self.cell_size * self.zoom_factor))
+        row_center = int((mouse_y - self.offset_y) / (self.cell_size * self.zoom_factor))
+
+        # Iterate over a Quadrat with dx radius and dy radius
+        for row in range(row_center - radius, row_center + radius + 1):
+            for col in range(col_center - radius, col_center + radius + 1):
+                # Prüfe, ob (row, col) im Gitter liegt
+                if 0 <= row < self.rows and 0 <= col < self.cols:
+                    # Check if cell is in circle radius
+                    if (row - row_center) ** 2 + (col - col_center) ** 2 <= radius ** 2:
+                        self.numpy_grid[row, col] = 2

@@ -12,6 +12,9 @@ line_color = (65, 65, 65)
 
 # Colony settings
 colony_radius = 4
+colony_color = (255, 0, 0)
+food_radius = 3
+food_color = (0, 255, 0)
 
 # Colors
 bg_color = (79, 79, 79)
@@ -21,7 +24,7 @@ screen = pygame.display.set_mode((width, height))
 pygame.display.set_caption("Ant-Simulation")
 
 # instantiate grid instance
-grid = Grid(rows, cols, cell_size, line_color)
+grid = Grid(rows, cols, cell_size, line_color, colony_color, food_color)
 
 dragging = False
 last_mouse_pos = (0, 0)
@@ -52,9 +55,10 @@ while True:
             last_mouse_pos = event.pos
 
         elif event.type == pygame.KEYDOWN:
-            # Drücke "h", um die Zelle an der aktuellen Mausposition grün zu färben
             if event.key == pygame.K_h:
-                grid.mark_circle(pygame.mouse.get_pos(), colony_radius)
+                grid.mark_colony(pygame.mouse.get_pos(), colony_radius)
+            if event.key == pygame.K_g:
+                grid.mark_food(pygame.mouse.get_pos(), food_radius)
 
     screen.fill(bg_color)
     grid.draw(screen)
