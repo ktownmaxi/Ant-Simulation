@@ -24,17 +24,16 @@ number_of_ants = 50
 bg_color = (79, 79, 79)
 
 pygame.init()
-screen = pygame.display.set_mode((width, height))
+screen = pygame.display.set_mode((width, height), pygame.DOUBLEBUF)
 pygame.display.set_caption("Ant-Simulation")
 
 # instantiate view_model and navigation_model instance
 view_model = GridViewModel(rows, cols, cell_size, line_color, colony_color, food_color)
 navigation_model = GridNavigationModel(view_model)
+ant_collection = None
 
 dragging = False
 last_mouse_pos = (0, 0)
-
-ant_collection = AntCollection(number_of_ants, cell_size, view_model, navigation_model)
 
 while True:
     for event in pygame.event.get():
@@ -62,8 +61,13 @@ while True:
             last_mouse_pos = event.pos
 
         elif event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_h:
+            if event.key == pygame.K_h and view_model.colony_pos == ():
                 view_model.mark_colony(pygame.mouse.get_pos(), colony_radius)
+                ant_collection = AntCollection(number_of_ants, cell_size, view_model,
+                                               navigation_model, view_model.colony_pos,
+                                               view_model.get_colony_border(view_model.colony_pos, colony_radius))
+                ant_collection.start_spawning()
+
             if event.key == pygame.K_g:
                 view_model.mark_food(pygame.mouse.get_pos(), food_radius)
 
@@ -71,5 +75,6 @@ while True:
 
     screen.fill(bg_color)
     view_model.draw(screen)
-    ant_collection.render(screen)
+    if ant_collection is not None:
+        ant_collection.render(screen)
     pygame.display.flip()

@@ -20,7 +20,7 @@ class GridViewModel(GridModel):
         self.normal_width = 1
         self.outer_width = 3
 
-        self.already_marked_circle = False
+        self.colony_pos = ()
 
     def build_numpy_model(self):
         grid_model = np.zeros((self.rows, self.cols), dtype=int)
@@ -98,7 +98,7 @@ class GridViewModel(GridModel):
         col_center = int((mouse_x - self.offset_x) / (self.cell_size * self.zoom_factor))
         row_center = int((mouse_y - self.offset_y) / (self.cell_size * self.zoom_factor))
 
-        if not self.already_marked_circle:
+        if self.colony_pos == ():
             # Iterate over a Quadrat with dx radius and dy radius
             for row in range(row_center - radius, row_center + radius + 1):
                 for col in range(col_center - radius, col_center + radius + 1):
@@ -108,7 +108,43 @@ class GridViewModel(GridModel):
                         if (row - row_center) ** 2 + (col - col_center) ** 2 <= radius ** 2:
                             self.data[row, col] = 1
 
-            self.already_marked_circle = True
+            self.colony_pos = (row_center, col_center)
+
+    def get_colony_border(self, circle_center, radius):
+        """
+        Calculates all cells, which are outside the circle but have a connection to the circle.
+        Returns:
+            a list of tuples (row, col) of the border cells.
+        """
+        (row_center, col_center) = circle_center
+
+        border_cells = []
+        # iterate over rect of radius + 2
+        for row in range(row_center - radius - 1, row_center + radius + 2):
+            for col in range(col_center - radius - 1, col_center + radius + 2):
+                # checks if cell in grid
+                if 0 <= row < self.rows and 0 <= col < self.cols:
+                    # cell is outside the circle
+                    if (row - row_center) ** 2 + (col - col_center) ** 2 > radius ** 2:
+                        # checks all neighbour cells (inc. diagonals)
+                        for d_row in (-1, 0, 1):
+                            for d_col in (-1, 0, 1):
+                                if d_row == 0 and d_col == 0:
+                                    continue  # current cell
+                                n_row = row + d_row
+                                n_col = col + d_col
+                                # checks if neighbour cell is outside the grid
+                                if 0 <= n_row < self.rows and 0 <= n_col < self.cols:
+                                    # checks if the neighbour cell is inside the circle
+                                    if (n_row - row_center) ** 2 + (n_col - col_center) ** 2 <= radius ** 2:
+                                        border_cells.append((row, col))
+                                        # valid neighbour cell is found
+                                        break
+                            else:
+                                continue
+                            break
+
+        return border_cells
 
     def mark_food(self, mouse_pos, radius):
         """
