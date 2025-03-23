@@ -7,6 +7,7 @@ from src.models.gridModel import GridModel
 class GridViewModel(GridModel):
     def __init__(self, rows, cols, cell_size, line_color, colony_color, food_color):
         super().__init__(rows, cols)
+        self.data = self.build_numpy_model()
         self.cell_size = cell_size
         self.line_color = line_color
 
@@ -23,7 +24,15 @@ class GridViewModel(GridModel):
         self.colony_pos = ()
 
     def build_numpy_model(self):
-        grid_model = np.zeros((self.rows, self.cols), dtype=int)
+        grid_model = np.zeros((self.rows, self.cols), dtype=object)
+        for i in range(self.rows):
+            for j in range(self.cols):
+                grid_model[i, j] = {
+                    'food': 0,
+                    'colony': 0,
+                    'toFood': None,
+                    'toColony': None
+                }
         return grid_model
 
     def get_absolute_position_data_of_cell(self, row, col):
@@ -48,9 +57,9 @@ class GridViewModel(GridModel):
                     cell_w = self.cell_size * self.zoom_factor
                     cell_h = self.cell_size * self.zoom_factor
 
-                    if self.data[row, col] == 1:
+                    if self.data[row, col]['colony'] == 1:
                         pygame.draw.rect(surface, self.colony_color, (cell_x, cell_y, cell_w, cell_h))
-                    elif self.data[row, col] == 2:
+                    elif self.data[row, col]['food'] == 1:
                         pygame.draw.rect(surface, self.food_color, (cell_x, cell_y, cell_w, cell_h))
 
         # horizontal lines
@@ -106,7 +115,7 @@ class GridViewModel(GridModel):
                     if 0 <= row < self.rows and 0 <= col < self.cols:
                         # Check if cell is in circle radius
                         if (row - row_center) ** 2 + (col - col_center) ** 2 <= radius ** 2:
-                            self.data[row, col] = 1
+                            self.data[row, col]['colony'] = 1
 
             self.colony_pos = (row_center, col_center)
 
@@ -163,4 +172,4 @@ class GridViewModel(GridModel):
                     # Check if cell is in circle radius
                     if (row - row_center) ** 2 + (col - col_center) ** 2 <= radius ** 2:
                         if self.data[row, col] != 1:
-                            self.data[row, col] = 2
+                            self.data[row, col]['food'] = 1

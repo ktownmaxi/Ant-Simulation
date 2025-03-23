@@ -6,7 +6,7 @@ class GridModel:
         self.rows = rows
         self.cols = cols
         self.default_value = default_value
-        self.data = np.full((rows, cols), default_value, dtype=float)
+        self.data = np.zeros((rows, cols), dtype=object)
 
     def __str__(self):
         return str(self.data)
