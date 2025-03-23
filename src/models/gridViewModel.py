@@ -21,19 +21,10 @@ class GridViewModel(GridModel):
         self.normal_width = 1
         self.outer_width = 3
 
-        self.colony_pos = ()
+        self.show_to_colony_markers = False
+        self.show_to_food_markers = True
 
-    def build_numpy_model(self):
-        grid_model = np.zeros((self.rows, self.cols), dtype=object)
-        for i in range(self.rows):
-            for j in range(self.cols):
-                grid_model[i, j] = {
-                    'food': 0,
-                    'colony': 0,
-                    'toFood': None,
-                    'toColony': None
-                }
-        return grid_model
+        self.colony_pos = ()
 
     def get_absolute_position_data_of_cell(self, row, col):
         cell_x = self.offset_x + col * self.cell_size * self.zoom_factor
@@ -61,6 +52,10 @@ class GridViewModel(GridModel):
                         pygame.draw.rect(surface, self.colony_color, (cell_x, cell_y, cell_w, cell_h))
                     elif self.data[row, col]['food'] == 1:
                         pygame.draw.rect(surface, self.food_color, (cell_x, cell_y, cell_w, cell_h))
+                    elif self.data[row, col]['toColony'] and self.show_to_colony_markers:
+                        pygame.draw.rect(surface, (0, 0, 255), (cell_x, cell_y, cell_w, cell_h))
+                    elif self.data[row, col]['toFood'] and self.show_to_food_markers:
+                        pygame.draw.rect(surface, (209, 134, 00), (cell_x, cell_y, cell_w, cell_h))
 
         # horizontal lines
         for row in range(self.rows + 1):

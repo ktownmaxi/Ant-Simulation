@@ -6,10 +6,22 @@ class GridModel:
         self.rows = rows
         self.cols = cols
         self.default_value = default_value
-        self.data = np.zeros((rows, cols), dtype=object)
+        self.data = self.build_numpy_model()
 
     def __str__(self):
         return str(self.data)
+
+    def build_numpy_model(self):
+        grid_model = np.zeros((self.rows, self.cols), dtype=object)
+        for i in range(self.rows):
+            for j in range(self.cols):
+                grid_model[i, j] = {
+                    'food': 0,
+                    'colony': 0,
+                    'toFood': [],
+                    'toColony': []
+                }
+        return grid_model
 
     def get_cell(self, row, col):
         return self.data[row, col]
