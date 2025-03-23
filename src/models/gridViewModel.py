@@ -26,6 +26,14 @@ class GridViewModel(GridModel):
         grid_model = np.zeros((self.rows, self.cols), dtype=int)
         return grid_model
 
+    def get_absolute_position_data_of_cell(self, row, col):
+        cell_x = self.offset_x + col * self.cell_size * self.zoom_factor
+        cell_y = self.offset_y + row * self.cell_size * self.zoom_factor
+        cell_w = self.cell_size * self.zoom_factor
+        cell_h = self.cell_size * self.zoom_factor
+
+        return cell_x, cell_y, cell_w, cell_h
+
     def draw(self, surface):
         # True size of grid
         grid_width = self.cols * self.cell_size * self.zoom_factor
