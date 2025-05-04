@@ -21,7 +21,10 @@ class Ant(Entity):
         self.to_home_value = 1
         self.to_food_value = 1
 
+        self.history = []
+
     def move_relative(self, pos_change):
+        self.history.append(self.pos)
         self.pos = tuple(a + b for a, b in zip(self.pos, pos_change))
 
     def move_get_absolute_vector_after_relative_move(self, pos_change):
@@ -30,12 +33,16 @@ class Ant(Entity):
     def move_to_absolute(self, pos):
         self.pos = pos
 
-    def check_if_ant_on_food_source(self) -> bool:
-        return self.navigation_model.get_cell(*self.get_position())['food'] == 1
+
+    def last_three_are_same(self, arr):
+        if len(arr) < 3:
+            return False
+        return arr[-1] == arr[-2] == arr[-3]
 
 
     def next_turn(self):
         while self.turn_cycle_active:
+
             visibleArea = self.navigation_model.get_visible_field(self.get_position())
             if self.food_loaded:
                 to_colony_points = visibleArea.find_all_filled_toColony(self)
@@ -45,12 +52,19 @@ class Ant(Entity):
                 self.to_food_value -= 0.001
                 self.move_relative(movement_vector)
 
+                if self.last_three_are_same(self.history):
+                    print(largest_to_colony_point_index, visibleArea.area)
+
+                if visibleArea.find_all_filled_colony(self):
+                    self.food_loaded = False
+
             else:
                 to_food_points = visibleArea.find_all_filled_toFood(self)
                 if len(to_food_points) > 0:  # food value found in surroundings
                     largest_value_index, _ = visibleArea.find_largest_value(to_food_points)
                     movement_vector = threeToThreeMatrixToRelativeVector(largest_value_index)
                     self.move_relative(movement_vector)
+
                 else:
                     possible_cells = visibleArea.find_all_unfilled_toColony(self)
                     chosen_cell = list(random.choice(possible_cells).keys())[0]
@@ -59,10 +73,10 @@ class Ant(Entity):
                     self.to_home_value -= 0.001
                     self.move_relative(movement_vector)
 
-                    if self.check_if_ant_on_food_source():
-                        self.food_loaded = True
+                if visibleArea.find_all_filled_food(self):
+                    self.food_loaded = True
 
-            time.sleep(0.2)
+            time.sleep(0.1)
 
     def start_turn_cycle(self):
         self.turn_cycle = threading.Thread(target=self.next_turn, daemon=True)
