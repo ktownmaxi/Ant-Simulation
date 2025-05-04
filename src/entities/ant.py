@@ -6,6 +6,7 @@ from typing import Type
 from src.entities.entity import Entity
 from src.models.gridNavigationModel import GridNavigationModel
 from src.models.gridViewModel import GridViewModel
+from src.helpers import threeToThreeMatrixToRelativeVector
 
 
 class Ant(Entity):
@@ -39,7 +40,7 @@ class Ant(Entity):
             if self.food_loaded:
                 to_colony_points = visibleArea.find_all_filled_toColony(self)
                 largest_to_colony_point_index = visibleArea.find_largest_value(to_colony_points)[0]
-                movement_vector = tuple(a + b for a, b in zip(largest_to_colony_point_index, (-1, -1)))
+                movement_vector = threeToThreeMatrixToRelativeVector(largest_to_colony_point_index)
                 self.navigation_model.place_to_food_marker(self.get_position(), self.to_food_value)
                 self.to_food_value -= 0.001
                 self.move_relative(movement_vector)
@@ -48,12 +49,12 @@ class Ant(Entity):
                 to_food_points = visibleArea.find_all_filled_toFood(self)
                 if len(to_food_points) > 0:  # food value found in surroundings
                     largest_value_index, _ = visibleArea.find_largest_value(to_food_points)
-                    movement_vector = tuple(a + b for a, b in zip(largest_value_index, (-1, -1)))
+                    movement_vector = threeToThreeMatrixToRelativeVector(largest_value_index)
                     self.move_relative(movement_vector)
                 else:
                     possible_cells = visibleArea.find_all_unfilled_toColony(self)
                     chosen_cell = list(random.choice(possible_cells).keys())[0]
-                    movement_vector = tuple(a + b for a, b in zip(chosen_cell, (-1, -1)))
+                    movement_vector = threeToThreeMatrixToRelativeVector(chosen_cell)
                     self.navigation_model.place_to_home_marker(self.get_position(), self.to_home_value)
                     self.to_home_value -= 0.001
                     self.move_relative(movement_vector)
@@ -62,7 +63,6 @@ class Ant(Entity):
                         self.food_loaded = True
 
             time.sleep(0.2)
-            self.next_turn()
 
     def start_turn_cycle(self):
         self.turn_cycle = threading.Thread(target=self.next_turn, daemon=True)
