@@ -2,9 +2,7 @@ import pygame
 import sys
 
 from src.entities.antCollection import AntCollection
-from src.models.gridNavigationModel import GridNavigationModel
-from src.models.gridViewModel import GridViewModel
-from models.modelHelper import sync_model_data
+from src.models.allPurposeModel import AllPurposeModel
 
 width, height = 1920, 1080
 
@@ -28,8 +26,7 @@ screen = pygame.display.set_mode((width, height), pygame.DOUBLEBUF)
 pygame.display.set_caption("Ant-Simulation")
 
 # instantiate view_model and navigation_model instance
-view_model = GridViewModel(rows, cols, cell_size, line_color, colony_color, food_color)
-navigation_model = GridNavigationModel(view_model)
+view_model = AllPurposeModel(rows, cols, cell_size, line_color, colony_color, food_color)
 ant_collection = None
 
 dragging = False
@@ -64,14 +61,12 @@ while True:
             if event.key == pygame.K_h and view_model.colony_pos == ():
                 view_model.mark_colony(pygame.mouse.get_pos(), colony_radius)
                 ant_collection = AntCollection(number_of_ants, cell_size, view_model,
-                                               navigation_model, view_model.colony_pos,
+                                               view_model.colony_pos,
                                                view_model.get_colony_border(view_model.colony_pos, colony_radius))
                 ant_collection.start_spawning()
 
             if event.key == pygame.K_g:
                 view_model.mark_food(pygame.mouse.get_pos(), food_radius)
-
-            sync_model_data(view_model, navigation_model)
 
     screen.fill(bg_color)
     view_model.draw(screen)

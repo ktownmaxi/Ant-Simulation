@@ -4,15 +4,14 @@ import time
 from typing import Type
 
 from src.entities.entity import Entity
-from src.models.gridNavigationModel import GridNavigationModel
-from src.models.gridViewModel import GridViewModel
+from src.models.allPurposeModel import AllPurposeModel
 from src.helpers import threeToThreeMatrixToRelativeVector
 
 
 class Ant(Entity):
-    def __init__(self, view_model: Type[GridViewModel], navigation_model: Type[GridNavigationModel],
+    def __init__(self, view_model: Type[AllPurposeModel],
                  visible=False, pos=(0, 0), turn_cycle_active=True):
-        super().__init__(view_model, navigation_model, pos)
+        super().__init__(view_model, pos)
         self.visible = visible
         self.food_loaded = False
         self.turn_cycle = None
@@ -35,25 +34,23 @@ class Ant(Entity):
 
 
     def last_three_are_same(self, arr):
-        if len(arr) < 3:
+        if len(arr) < 2:
             return False
-        return arr[-1] == arr[-2] == arr[-3]
+        return arr[-1] == arr[-2]
 
 
     def next_turn(self):
         while self.turn_cycle_active:
 
-            visibleArea = self.navigation_model.get_visible_field(self.get_position())
+            visibleArea = self.view_model.get_visible_field(self.get_position())
+
             if self.food_loaded:
                 to_colony_points = visibleArea.find_all_filled_toColony(self)
                 largest_to_colony_point_index = visibleArea.find_largest_value(to_colony_points)[0]
                 movement_vector = threeToThreeMatrixToRelativeVector(largest_to_colony_point_index)
-                self.navigation_model.place_to_food_marker(self.get_position(), self.to_food_value)
+                self.view_model.place_to_food_marker(self.get_position(), self.to_food_value)
                 self.to_food_value -= 0.001
                 self.move_relative(movement_vector)
-
-                if self.last_three_are_same(self.history):
-                    print(largest_to_colony_point_index, visibleArea.area)
 
                 if visibleArea.find_all_filled_colony(self):
                     self.food_loaded = False
@@ -69,7 +66,7 @@ class Ant(Entity):
                     possible_cells = visibleArea.find_all_unfilled_toColony(self)
                     chosen_cell = list(random.choice(possible_cells).keys())[0]
                     movement_vector = threeToThreeMatrixToRelativeVector(chosen_cell)
-                    self.navigation_model.place_to_home_marker(self.get_position(), self.to_home_value)
+                    self.view_model.place_to_home_marker(self.get_position(), self.to_home_value)
                     self.to_home_value -= 0.001
                     self.move_relative(movement_vector)
 

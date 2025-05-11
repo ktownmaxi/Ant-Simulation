@@ -7,19 +7,16 @@ import threading
 import pygame
 
 from src.entities.ant import Ant
-from src.models.gridNavigationModel import GridNavigationModel
-from src.models.gridViewModel import GridViewModel
+from src.models.allPurposeModel import AllPurposeModel
 
 
 class AntCollection:
-    def __init__(self, number_of_ants, cell_size, view_model: Type[GridViewModel],
-                 navigation_model: Type[GridNavigationModel], pos=(0, 0), spawnable_positions=None):
+    def __init__(self, number_of_ants, cell_size, view_model: Type[AllPurposeModel], pos=(0, 0), spawnable_positions=None):
         if spawnable_positions is None:
             self.spawnable_positions = []
         else:
             self.spawnable_positions = spawnable_positions
         self.view_model = view_model
-        self.navigation_model = navigation_model
         self.ant_collection = self.create_ant_collection(number_of_ants, pos)
 
         self.cell_size = cell_size
@@ -34,7 +31,7 @@ class AntCollection:
     def create_ant_collection(self, number_of_ants, pos):
         ant_collection = []
         for i in range(number_of_ants):
-            ant_collection.append(Ant(self.view_model, self.navigation_model, pos))
+            ant_collection.append(Ant(self.view_model, pos))
 
         return ant_collection
 

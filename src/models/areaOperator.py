@@ -83,13 +83,7 @@ class AreaOperator:
     def filter_invalid_cells(self, ant, cell_selection: dict[tuple[int, int], object]) -> list[dict[tuple[int, int], list[int]]]:
         final_list = []
         for cell in cell_selection:
-            cell_position = list(cell.keys())[0]
-            cell_data = self.navigation_model.get_cell(
-                # TODO: fix invalid vectors (out of bounds)
-                *ant.move_get_absolute_vector_after_relative_move(cell_position)
-            )
-            if cell_data['food'] != 1 and cell_data['colony'] != 1:
-                final_list.append(cell)
+            final_list.append(cell)
 
         return final_list
 
