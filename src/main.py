@@ -16,7 +16,7 @@ colony_radius = 4
 colony_color = (255, 0, 0)
 food_radius = 3
 food_color = (0, 255, 0)
-number_of_ants = 50
+number_of_ants = 500
 
 # Colors
 bg_color = (79, 79, 79)
