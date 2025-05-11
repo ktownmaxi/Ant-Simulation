@@ -1,3 +1,6 @@
+import random
+
+
 class AreaOperator:
     def __init__(self, area, navigation_model):
         self.area = area
@@ -46,41 +49,49 @@ class AreaOperator:
                     })
 
         final_indices = self.filter_invalid_cells(ant, filled_indices)
-        if len(filled_indices) <= 0 or len(final_indices) <= 0:
-            return self.find_all_unfilled_toColony(ant)
+        if not final_indices:
+            return []
 
         return final_indices
 
-    # TODO: fix death loop :)
     def find_all_unfilled_toColony(self, ant) -> list[dict[tuple[int, int], list[int]]]:
         filled_indices = []
         for i, array in enumerate(self.area):
             for j, item in enumerate(array):
-                if not item['toColony']:  # toColony is filled
+                if not item['toColony']:  # toColony is not filled
                     filled_indices.append({
                         (i, j): None
                     })
 
         final_indices = self.filter_invalid_cells(ant, filled_indices)
-        if len(filled_indices) <= 0 or len(final_indices) <= 0:
-            return self.find_all_filled_toColony(ant)
+        if not final_indices:
+            return [{
+                self.generate_random_cell(): None
+            }]
 
         return final_indices
 
     def find_largest_value(self, area: list[dict[tuple[int, int], list[int]]]) -> tuple[tuple[int, int], float]:
         largest_value = float('-inf')
-        largest_value_key = [0, 0]
+        largest_value_key = (0, 0)
 
         for item in area:
             for key, value in item.items():
-                # find the biggest value
                 if max(value) > largest_value:
                     largest_value = max(value)
                     largest_value_key = key
 
+        if largest_value_key == (1, 1):
+            return self.generate_random_cell(), largest_value - 0.001
+
         return largest_value_key, largest_value
 
-    def filter_invalid_cells(self, ant, cell_selection: dict[tuple[int, int], object]) -> list[dict[tuple[int, int], list[int]]]:
+    def generate_random_cell(self) -> tuple[int, int]:
+        matrix_elements = [(i, j) for i in range(3) for j in range(3) if (i, j) != (1, 1)]
+        return random.choice(matrix_elements)
+
+    def filter_invalid_cells(self, ant, cell_selection: dict[tuple[int, int], object]) -> list[
+            dict[tuple[int, int], list[int]]]:
         final_list = []
         for cell in cell_selection:
             final_list.append(cell)

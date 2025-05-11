@@ -32,13 +32,6 @@ class Ant(Entity):
     def move_to_absolute(self, pos):
         self.pos = pos
 
-
-    def last_three_are_same(self, arr):
-        if len(arr) < 2:
-            return False
-        return arr[-1] == arr[-2]
-
-
     def next_turn(self):
         while self.turn_cycle_active:
 
@@ -46,11 +39,14 @@ class Ant(Entity):
 
             if self.food_loaded:
                 to_colony_points = visibleArea.find_all_filled_toColony(self)
-                largest_to_colony_point_index = visibleArea.find_largest_value(to_colony_points)[0]
-                movement_vector = threeToThreeMatrixToRelativeVector(largest_to_colony_point_index)
-                self.view_model.place_to_food_marker(self.get_position(), self.to_food_value)
-                self.to_food_value -= 0.001
-                self.move_relative(movement_vector)
+                if len(to_colony_points) == 0:
+                    self.move_relative(visibleArea.generate_random_cell())
+                else:
+                    largest_to_colony_point_index, _ = visibleArea.find_largest_value(to_colony_points)
+                    movement_vector = threeToThreeMatrixToRelativeVector(largest_to_colony_point_index)
+                    self.view_model.place_to_food_marker(self.get_position(), self.to_food_value)
+                    self.to_food_value -= 0.001
+                    self.move_relative(movement_vector)
 
                 if visibleArea.find_all_filled_colony(self):
                     self.food_loaded = False
