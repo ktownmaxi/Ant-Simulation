@@ -44,15 +44,16 @@ class AllPurposeModel(GridModel):
         return cell_x, cell_y, cell_w, cell_h
 
     def draw(self, surface: pygame.Surface):
+        cell_size_zoom = self.cell_size * self.zoom_factor
         # True size of grid
-        grid_width = self.cols * self.cell_size * self.zoom_factor
-        grid_height = self.rows * self.cell_size * self.zoom_factor
+        grid_width = self.cols * cell_size_zoom
+        grid_height = self.rows * cell_size_zoom
 
         granularity = 1 if self.zoom_factor >= self.granularity_threshold else 2
 
         # horizontal lines
         for row in range(0, self.rows + 1, granularity):
-            y = self.offset_y + row * self.cell_size * self.zoom_factor
+            y = self.offset_y + row * cell_size_zoom
             start_x = self.offset_x
             end_x = self.offset_x + grid_width
             lw = self.outer_width if row == 0 or row == self.rows else self.normal_width
@@ -60,29 +61,40 @@ class AllPurposeModel(GridModel):
 
         # vertical lines
         for col in range(0, self.cols + 1, granularity):
-            x = self.offset_x + col * self.cell_size * self.zoom_factor
+            x = self.offset_x + col * cell_size_zoom
             start_y = self.offset_y
             end_y = self.offset_y + grid_height
             lw = self.outer_width if col == 0 or col == self.cols else self.normal_width
             pygame.draw.line(surface, self.line_color, (x, start_y), (x, end_y), lw)
 
         # render all colored cells
+        base_rect = pygame.Rect(0, 0, cell_size_zoom + 1, cell_size_zoom + 1)
         for row in range(self.rows):
             for col in range(self.cols):
-                if self.data[row, col] == 1 or 2:
-                    cell_x = self.offset_x + col * self.cell_size * self.zoom_factor
-                    cell_y = self.offset_y + row * self.cell_size * self.zoom_factor
-                    cell_w = self.cell_size * self.zoom_factor
-                    cell_h = self.cell_size * self.zoom_factor
+                cell = self.data[row, col]
+                x = self.offset_x + col * cell_size_zoom
+                y = self.offset_y + row * cell_size_zoom
+                rect = base_rect.move(x, y)
 
-                    if self.data[row, col]['colony'] == 1:
-                        pygame.draw.rect(surface, self.colony_color, (cell_x, cell_y, cell_w + 1, cell_h + 1))
-                    elif self.data[row, col]['food'] == 1:
-                        pygame.draw.rect(surface, self.food_color, (cell_x, cell_y, cell_w + 1, cell_h + 1))
-                    elif self.data[row, col]['toColony'] and self.show_to_colony_markers:
-                        pygame.draw.rect(surface, (0, 0, 255), (cell_x, cell_y, cell_w, cell_h))
-                    elif self.data[row, col]['toFood'] and self.show_to_food_markers:
-                        pygame.draw.rect(surface, (209, 134, 00), (cell_x, cell_y, cell_w, cell_h))
+                changed = False
+
+                if cell['colony'] == 1:
+                    color = self.colony_color
+                    changed = True
+                elif cell['food'] == 1:
+                    color = self.food_color
+                    changed = True
+                elif cell['toColony'] and self.show_to_colony_markers:
+                    color = (0, 0, 255)
+                    changed = True
+                elif cell['toFood'] and self.show_to_food_markers:
+                    color = (209, 134, 0)
+                    rect.size = (cell_size_zoom, cell_size_zoom)
+                    changed = True
+
+                if changed:
+                    pygame.draw.rect(surface, color, rect)
+
 
     def zoom(self, mouse_pos: tuple[int, int], zoom_in=True):
         mouse_x, mouse_y = mouse_pos
