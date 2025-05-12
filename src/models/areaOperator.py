@@ -48,11 +48,10 @@ class AreaOperator:
                         (i, j): item['toColony']
                     })
 
-        final_indices = self.filter_invalid_cells(ant, filled_indices)
-        if not final_indices:
+        if not filled_indices:
             return []
 
-        return final_indices
+        return filled_indices
 
     def find_all_unfilled_toColony(self, ant) -> list[dict[tuple[int, int], list[int]]]:
         filled_indices = []
@@ -63,13 +62,12 @@ class AreaOperator:
                         (i, j): None
                     })
 
-        final_indices = self.filter_invalid_cells(ant, filled_indices)
-        if not final_indices:
+        if not filled_indices:
             return [{
                 self.generate_random_cell(): None
             }]
 
-        return final_indices
+        return filled_indices
 
     def find_largest_value(self, area: list[dict[tuple[int, int], list[int]]]) -> tuple[tuple[int, int], float]:
         """
@@ -94,14 +92,6 @@ class AreaOperator:
     def generate_random_cell(self) -> tuple[int, int]:
         matrix_elements = [(i, j) for i in range(3) for j in range(3) if (i, j) != (1, 1)]  # random cell except (1,1)
         return random.choice(matrix_elements)
-
-    def filter_invalid_cells(self, ant, cell_selection: dict[tuple[int, int], object]) -> list[
-            dict[tuple[int, int], list[int]]]:
-        final_list = []
-        for cell in cell_selection:
-            final_list.append(cell)
-
-        return final_list
 
     def get_area(self):
         return self.area
