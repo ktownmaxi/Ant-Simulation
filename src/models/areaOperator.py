@@ -1,4 +1,5 @@
 import random
+from ..helpers import threeToThreeMatrixToRelativeVector
 
 
 class AreaOperator:

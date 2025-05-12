@@ -20,17 +20,20 @@ class Ant(Entity):
         self.to_home_value = 1
         self.to_food_value = 1
 
-        self.history = []
-
     def move_relative(self, pos_change):
-        self.history.append(self.pos)
-        self.pos = tuple(a + b for a, b in zip(self.pos, pos_change))
+        new_pos = self.move_get_absolute_vector_after_relative_move(pos_change)
+        print(new_pos)
+        if self.is_valid_cell(new_pos):
+            self.pos = new_pos
 
-    def move_get_absolute_vector_after_relative_move(self, pos_change):
+    def move_get_absolute_vector_after_relative_move(self, pos_change) -> tuple[int, int]:
         return tuple(a + b for a, b in zip(self.pos, pos_change))
 
     def move_to_absolute(self, pos):
         self.pos = pos
+
+    def is_valid_cell(self, absolute_position: tuple[int, int]):
+        return 0 < absolute_position[0] < self.model.rows and 0 < absolute_position[1] < self.model.cols
 
     def next_turn(self):
         while self.turn_cycle_active:
