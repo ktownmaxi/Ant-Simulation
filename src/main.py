@@ -10,6 +10,8 @@ width, height = 1920, 1080
 rows, cols = 200, 300
 cell_size = 15
 line_color = (65, 65, 65)
+starting_zoom_factor = 0.4
+min_zoom, max_zoom = 0.25, 7.5
 
 # Colony settings
 colony_radius = 4
@@ -26,7 +28,8 @@ screen = pygame.display.set_mode((width, height), pygame.DOUBLEBUF)
 pygame.display.set_caption("Ant-Simulation")
 
 # instantiate model instance
-model = AllPurposeModel(rows, cols, cell_size, line_color, colony_color, food_color)
+model = AllPurposeModel(rows, cols, cell_size, line_color, colony_color, food_color, starting_zoom_factor,
+                        min_zoom, max_zoom)
 ant_collection = None
 
 dragging = False

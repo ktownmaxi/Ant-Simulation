@@ -5,7 +5,8 @@ from src.models.gridModel import GridModel
 
 
 class AllPurposeModel(GridModel):
-    def __init__(self, rows, cols, cell_size, line_color, colony_color, food_color, granularity_threshold=0.6):
+    def __init__(self, rows, cols, cell_size, line_color, colony_color, food_color, starting_zoom_factor, min_zoom,
+                 max_zoom, granularity_threshold=0.6):
         super().__init__(rows, cols)
         self.data = self.build_numpy_model()
         self.cell_size = cell_size
@@ -16,8 +17,8 @@ class AllPurposeModel(GridModel):
 
         self.granularity_threshold = granularity_threshold
 
-        self.zoom_factor = 0.4
-        self.min_zoom, self.max_zoom = 0.25, 7.5
+        self.zoom_factor = starting_zoom_factor
+        self.min_zoom, self.max_zoom = min_zoom, max_zoom
         self.offset_x, self.offset_y = 0, 0
 
         self.normal_width = 1
@@ -28,7 +29,13 @@ class AllPurposeModel(GridModel):
 
         self.colony_pos = ()
 
-    def get_absolute_position_data_of_cell(self, row, col):
+    def get_absolute_position_data_of_cell(self, row: int, col: int):
+        """
+        Returns the data of a cell
+        :param row: integer that describes the row
+        :param col: integer that describes the column
+        :return:
+        """
         cell_x = self.offset_x + col * self.cell_size * self.zoom_factor
         cell_y = self.offset_y + row * self.cell_size * self.zoom_factor
         cell_w = self.cell_size * self.zoom_factor
@@ -36,7 +43,7 @@ class AllPurposeModel(GridModel):
 
         return cell_x, cell_y, cell_w, cell_h
 
-    def draw(self, surface):
+    def draw(self, surface: pygame.Surface):
         # True size of grid
         grid_width = self.cols * self.cell_size * self.zoom_factor
         grid_height = self.rows * self.cell_size * self.zoom_factor
@@ -77,7 +84,7 @@ class AllPurposeModel(GridModel):
                     elif self.data[row, col]['toFood'] and self.show_to_food_markers:
                         pygame.draw.rect(surface, (209, 134, 00), (cell_x, cell_y, cell_w, cell_h))
 
-    def zoom(self, mouse_pos, zoom_in=True):
+    def zoom(self, mouse_pos: tuple[int, int], zoom_in=True):
         mouse_x, mouse_y = mouse_pos
         old_zoom = self.zoom_factor
 
@@ -90,16 +97,16 @@ class AllPurposeModel(GridModel):
         self.offset_x = mouse_x - (mouse_x - self.offset_x) * scale
         self.offset_y = mouse_y - (mouse_y - self.offset_y) * scale
 
-    def pan(self, dx, dy):
+    def pan(self, dx: int, dy: int):
         """
         Updates offset in the grid object
         """
         self.offset_x += dx
         self.offset_y += dy
 
-    def mark_colony(self, mouse_pos, radius):
+    def mark_colony(self, mouse_pos: tuple[int, int], radius: int):
         """
-        Marks a circle of radius radius on the grid by placing 1s in the numpy model
+        Marks a circle of radius radius on the grid by placing 1 s in the numpy model
         Used to place the colony
         """
         mouse_x, mouse_y = mouse_pos
@@ -118,7 +125,7 @@ class AllPurposeModel(GridModel):
 
             self.colony_pos = (row_center, col_center)
 
-    def get_colony_border(self, circle_center, radius):
+    def get_colony_border(self, circle_center: tuple[int, int], radius: int):
         """
         Calculates all cells, which are outside the circle but have a connection to the circle.
         Returns:
@@ -134,19 +141,19 @@ class AllPurposeModel(GridModel):
                 if 0 <= row < self.rows and 0 <= col < self.cols:
                     # cell is outside the circle
                     if (row - row_center) ** 2 + (col - col_center) ** 2 > radius ** 2:
-                        # checks all neighbour cells (inc. diagonals)
+                        # checks all neighbor cells (inc. diagonals)
                         for d_row in (-1, 0, 1):
                             for d_col in (-1, 0, 1):
                                 if d_row == 0 and d_col == 0:
                                     continue  # current cell
                                 n_row = row + d_row
                                 n_col = col + d_col
-                                # checks if neighbour cell is outside the grid
+                                # checks if the neighbor cell is outside the grid
                                 if 0 <= n_row < self.rows and 0 <= n_col < self.cols:
-                                    # checks if the neighbour cell is inside the circle
+                                    # checks if the neighbor cell is inside the circle
                                     if (n_row - row_center) ** 2 + (n_col - col_center) ** 2 <= radius ** 2:
                                         border_cells.append((row, col))
-                                        # valid neighbour cell is found
+                                        # a valid neighbor cell is found
                                         break
                             else:
                                 continue
@@ -154,9 +161,9 @@ class AllPurposeModel(GridModel):
 
         return border_cells
 
-    def mark_food(self, mouse_pos, radius):
+    def mark_food(self, mouse_pos: tuple[int, int], radius: int):
         """
-        Marks a circle of radius radius on the grid by placing 1s in the numpy model
+        Marks a circle of radius radius on the grid by placing 1 s in the numpy model
         Used to place the food for the colony
         """
         mouse_x, mouse_y = mouse_pos

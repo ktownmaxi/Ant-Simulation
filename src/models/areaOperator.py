@@ -1,5 +1,4 @@
 import random
-from ..helpers import threeToThreeMatrixToRelativeVector
 
 
 class AreaOperator:
@@ -73,6 +72,11 @@ class AreaOperator:
         return final_indices
 
     def find_largest_value(self, area: list[dict[tuple[int, int], list[int]]]) -> tuple[tuple[int, int], float]:
+        """
+        Get the largest value in the area and the corresponding cell. Orders by value in dict
+        :param area:
+        :return:
+        """
         largest_value = float('-inf')
         largest_value_key = (0, 0)
 
@@ -88,7 +92,7 @@ class AreaOperator:
         return largest_value_key, largest_value
 
     def generate_random_cell(self) -> tuple[int, int]:
-        matrix_elements = [(i, j) for i in range(3) for j in range(3) if (i, j) != (1, 1)]
+        matrix_elements = [(i, j) for i in range(3) for j in range(3) if (i, j) != (1, 1)]  # random cell except (1,1)
         return random.choice(matrix_elements)
 
     def filter_invalid_cells(self, ant, cell_selection: dict[tuple[int, int], object]) -> list[

@@ -24,9 +24,12 @@ class AntCollection:
         self.ant_image, self.red_ant_image = self.load_assets()
 
     def load_assets(self):
-        ant_path, red_ant_path = os.path.join("src", "assets", "green_ant.png"), os.path.join("src", "assets", "red_ant.png")
+        ant_path = os.path.join("src", "assets", "green_ant.png")
+        red_ant_path = os.path.join("src", "assets", "red_ant.png")
+
         ant_img = pygame.image.load(ant_path).convert_alpha()
         red_ant_path = pygame.image.load(red_ant_path).convert_alpha()
+
         return ant_img, red_ant_path
 
     def create_ant_collection(self, number_of_ants, pos):
