@@ -1,10 +1,15 @@
+import os.path
+
 import pygame
 import sys
 
 from src.entities.antCollection import AntCollection
 from src.models.allPurposeModel import AllPurposeModel
+from src.ui.ui import UI
 
 width, height = 1920, 1080
+
+max_fps = 60
 
 # Grid-Settings
 rows, cols = 200, 300
@@ -27,13 +32,19 @@ pygame.init()
 screen = pygame.display.set_mode((width, height), pygame.DOUBLEBUF)
 pygame.display.set_caption("Ant-Simulation")
 
+font_path = os.path.join('src', 'assets', 'fonts', 'default.ttf')
+
 # instantiate model instance
 model = AllPurposeModel(rows, cols, cell_size, line_color, colony_color, food_color, starting_zoom_factor,
                         min_zoom, max_zoom)
+
+ui = UI(font_path, (width, height))
 ant_collection = None
 
 dragging = False
 last_mouse_pos = (0, 0)
+
+clock = pygame.time.Clock()
 
 while True:
     for event in pygame.event.get():
@@ -73,6 +84,9 @@ while True:
 
     screen.fill(bg_color)
     model.draw(screen)
+    ui.draw(screen, int(clock.get_fps()))
     if ant_collection is not None:
         ant_collection.render(screen)
     pygame.display.flip()
+
+    clock.tick(max_fps)
