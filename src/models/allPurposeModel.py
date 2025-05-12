@@ -5,7 +5,7 @@ from src.models.gridModel import GridModel
 
 
 class AllPurposeModel(GridModel):
-    def __init__(self, rows, cols, cell_size, line_color, colony_color, food_color):
+    def __init__(self, rows, cols, cell_size, line_color, colony_color, food_color, granularity_threshold=0.6):
         super().__init__(rows, cols)
         self.data = self.build_numpy_model()
         self.cell_size = cell_size
@@ -13,6 +13,8 @@ class AllPurposeModel(GridModel):
 
         self.colony_color = colony_color
         self.food_color = food_color
+
+        self.granularity_threshold = granularity_threshold
 
         self.zoom_factor = 0.4
         self.min_zoom, self.max_zoom = 0.25, 7.5
@@ -39,6 +41,24 @@ class AllPurposeModel(GridModel):
         grid_width = self.cols * self.cell_size * self.zoom_factor
         grid_height = self.rows * self.cell_size * self.zoom_factor
 
+        granularity = 1 if self.zoom_factor >= self.granularity_threshold else 2
+
+        # horizontal lines
+        for row in range(0, self.rows + 1, granularity):
+            y = self.offset_y + row * self.cell_size * self.zoom_factor
+            start_x = self.offset_x
+            end_x = self.offset_x + grid_width
+            lw = self.outer_width if row == 0 or row == self.rows else self.normal_width
+            pygame.draw.line(surface, self.line_color, (start_x, y), (end_x, y), lw)
+
+        # vertical lines
+        for col in range(0, self.cols + 1, granularity):
+            x = self.offset_x + col * self.cell_size * self.zoom_factor
+            start_y = self.offset_y
+            end_y = self.offset_y + grid_height
+            lw = self.outer_width if col == 0 or col == self.cols else self.normal_width
+            pygame.draw.line(surface, self.line_color, (x, start_y), (x, end_y), lw)
+
         # render all colored cells
         for row in range(self.rows):
             for col in range(self.cols):
@@ -49,29 +69,13 @@ class AllPurposeModel(GridModel):
                     cell_h = self.cell_size * self.zoom_factor
 
                     if self.data[row, col]['colony'] == 1:
-                        pygame.draw.rect(surface, self.colony_color, (cell_x, cell_y, cell_w, cell_h))
+                        pygame.draw.rect(surface, self.colony_color, (cell_x, cell_y, cell_w + 1, cell_h + 1))
                     elif self.data[row, col]['food'] == 1:
-                        pygame.draw.rect(surface, self.food_color, (cell_x, cell_y, cell_w, cell_h))
+                        pygame.draw.rect(surface, self.food_color, (cell_x, cell_y, cell_w + 1, cell_h + 1))
                     elif self.data[row, col]['toColony'] and self.show_to_colony_markers:
                         pygame.draw.rect(surface, (0, 0, 255), (cell_x, cell_y, cell_w, cell_h))
                     elif self.data[row, col]['toFood'] and self.show_to_food_markers:
                         pygame.draw.rect(surface, (209, 134, 00), (cell_x, cell_y, cell_w, cell_h))
-
-        # horizontal lines
-        for row in range(self.rows + 1):
-            y = self.offset_y + row * self.cell_size * self.zoom_factor
-            start_x = self.offset_x
-            end_x = self.offset_x + grid_width
-            lw = self.outer_width if row == 0 or row == self.rows else self.normal_width
-            pygame.draw.line(surface, self.line_color, (start_x, y), (end_x, y), lw)
-
-        # vertical lines
-        for col in range(self.cols + 1):
-            x = self.offset_x + col * self.cell_size * self.zoom_factor
-            start_y = self.offset_y
-            end_y = self.offset_y + grid_height
-            lw = self.outer_width if col == 0 or col == self.cols else self.normal_width
-            pygame.draw.line(surface, self.line_color, (x, start_y), (x, end_y), lw)
 
     def zoom(self, mouse_pos, zoom_in=True):
         mouse_x, mouse_y = mouse_pos

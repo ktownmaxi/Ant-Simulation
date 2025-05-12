@@ -7,7 +7,7 @@ from src.models.allPurposeModel import AllPurposeModel
 width, height = 1920, 1080
 
 # Grid-Settings
-rows, cols = 150, 150
+rows, cols = 200, 300
 cell_size = 15
 line_color = (65, 65, 65)
 
@@ -25,7 +25,7 @@ pygame.init()
 screen = pygame.display.set_mode((width, height), pygame.DOUBLEBUF)
 pygame.display.set_caption("Ant-Simulation")
 
-# instantiate view_model and navigation_model instance
+# instantiate model instance
 view_model = AllPurposeModel(rows, cols, cell_size, line_color, colony_color, food_color)
 ant_collection = None
 
