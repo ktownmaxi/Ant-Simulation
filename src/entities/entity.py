@@ -5,9 +5,9 @@ from src.models.allPurposeModel import AllPurposeModel
 
 
 class Entity(ABC):
-    def __init__(self, view_model: Type[AllPurposeModel], pos=(0, 0)):
+    def __init__(self, model: Type[AllPurposeModel], pos=(0, 0)):
         self.pos = pos  # position in Grid
-        self.view_model = view_model
+        self.model = model
 
     @abstractmethod
     def move_relative(self, pos_change: tuple[int, int]):

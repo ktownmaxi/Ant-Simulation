@@ -9,9 +9,9 @@ from src.helpers import threeToThreeMatrixToRelativeVector
 
 
 class Ant(Entity):
-    def __init__(self, view_model: Type[AllPurposeModel],
+    def __init__(self, model: Type[AllPurposeModel],
                  visible=False, pos=(0, 0), turn_cycle_active=True):
-        super().__init__(view_model, pos)
+        super().__init__(model, pos)
         self.visible = visible
         self.food_loaded = False
         self.turn_cycle = None
@@ -35,7 +35,7 @@ class Ant(Entity):
     def next_turn(self):
         while self.turn_cycle_active:
 
-            visibleArea = self.view_model.get_visible_field(self.get_position())
+            visibleArea = self.model.get_visible_field(self.get_position())
 
             if self.food_loaded:
                 to_colony_points = visibleArea.find_all_filled_toColony(self)
@@ -44,7 +44,7 @@ class Ant(Entity):
                 else:
                     largest_to_colony_point_index, _ = visibleArea.find_largest_value(to_colony_points)
                     movement_vector = threeToThreeMatrixToRelativeVector(largest_to_colony_point_index)
-                    self.view_model.place_to_food_marker(self.get_position(), self.to_food_value)
+                    self.model.place_to_food_marker(self.get_position(), self.to_food_value)
                     self.to_food_value -= 0.001
                     self.move_relative(movement_vector)
 
@@ -62,7 +62,7 @@ class Ant(Entity):
                     possible_cells = visibleArea.find_all_unfilled_toColony(self)
                     chosen_cell = list(random.choice(possible_cells).keys())[0]
                     movement_vector = threeToThreeMatrixToRelativeVector(chosen_cell)
-                    self.view_model.place_to_home_marker(self.get_position(), self.to_home_value)
+                    self.model.place_to_home_marker(self.get_position(), self.to_home_value)
                     self.to_home_value -= 0.001
                     self.move_relative(movement_vector)
 
@@ -79,7 +79,7 @@ class Ant(Entity):
         self.turn_cycle_active = False
 
     def get_absolute_position_of_ant(self):
-        cell_x, cell_y, cell_w, cell_h = self.view_model.get_absolute_position_data_of_cell(*self.pos)
+        cell_x, cell_y, cell_w, cell_h = self.model.get_absolute_position_data_of_cell(*self.pos)
         center_x = cell_x + cell_w / 2
         center_y = cell_y + cell_h / 2
 

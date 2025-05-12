@@ -26,7 +26,7 @@ screen = pygame.display.set_mode((width, height), pygame.DOUBLEBUF)
 pygame.display.set_caption("Ant-Simulation")
 
 # instantiate model instance
-view_model = AllPurposeModel(rows, cols, cell_size, line_color, colony_color, food_color)
+model = AllPurposeModel(rows, cols, cell_size, line_color, colony_color, food_color)
 ant_collection = None
 
 dragging = False
@@ -43,9 +43,9 @@ while True:
                 dragging = True
                 last_mouse_pos = event.pos
             elif event.button == 4:  # Scroll up => Zoom in
-                view_model.zoom(event.pos, zoom_in=True)
+                model.zoom(event.pos, zoom_in=True)
             elif event.button == 5:  # Scroll down => Zoom out
-                view_model.zoom(event.pos, zoom_in=False)
+                model.zoom(event.pos, zoom_in=False)
 
         elif event.type == pygame.MOUSEBUTTONUP:
             if event.button == 2:
@@ -54,22 +54,22 @@ while True:
         elif event.type == pygame.MOUSEMOTION and dragging:
             dx = event.pos[0] - last_mouse_pos[0]
             dy = event.pos[1] - last_mouse_pos[1]
-            view_model.pan(dx, dy)
+            model.pan(dx, dy)
             last_mouse_pos = event.pos
 
         elif event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_h and view_model.colony_pos == ():
-                view_model.mark_colony(pygame.mouse.get_pos(), colony_radius)
-                ant_collection = AntCollection(number_of_ants, cell_size, view_model,
-                                               view_model.colony_pos,
-                                               view_model.get_colony_border(view_model.colony_pos, colony_radius))
+            if event.key == pygame.K_h and model.colony_pos == ():
+                model.mark_colony(pygame.mouse.get_pos(), colony_radius)
+                ant_collection = AntCollection(number_of_ants, cell_size, model,
+                                               model.colony_pos,
+                                               model.get_colony_border(model.colony_pos, colony_radius))
                 ant_collection.start_spawning()
 
             if event.key == pygame.K_g:
-                view_model.mark_food(pygame.mouse.get_pos(), food_radius)
+                model.mark_food(pygame.mouse.get_pos(), food_radius)
 
     screen.fill(bg_color)
-    view_model.draw(screen)
+    model.draw(screen)
     if ant_collection is not None:
         ant_collection.render(screen)
     pygame.display.flip()

@@ -11,12 +11,12 @@ from src.models.allPurposeModel import AllPurposeModel
 
 
 class AntCollection:
-    def __init__(self, number_of_ants, cell_size, view_model: Type[AllPurposeModel], pos=(0, 0), spawnable_positions=None):
+    def __init__(self, number_of_ants, cell_size, model: Type[AllPurposeModel], pos=(0, 0), spawnable_positions=None):
         if spawnable_positions is None:
             self.spawnable_positions = []
         else:
             self.spawnable_positions = spawnable_positions
-        self.view_model = view_model
+        self.model = model
         self.ant_collection = self.create_ant_collection(number_of_ants, pos)
 
         self.cell_size = cell_size
@@ -32,7 +32,7 @@ class AntCollection:
     def create_ant_collection(self, number_of_ants, pos):
         ant_collection = []
         for i in range(number_of_ants):
-            ant_collection.append(Ant(self.view_model, pos))
+            ant_collection.append(Ant(self.model, pos))
 
         return ant_collection
 
@@ -40,7 +40,7 @@ class AntCollection:
         return self.ant_collection
 
     def render(self, screen):
-        true_img_size = self.cell_size * self.view_model.zoom_factor * 2
+        true_img_size = self.cell_size * self.model.zoom_factor * 2
         ant_img = pygame.transform.scale(self.ant_image, (true_img_size, true_img_size))
         red_ant_img = pygame.transform.scale(self.red_ant_image, (true_img_size, true_img_size))
         for ant in self.ant_collection:
