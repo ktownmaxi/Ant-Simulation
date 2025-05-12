@@ -32,7 +32,7 @@ class AntCollection:
     def create_ant_collection(self, number_of_ants, pos):
         ant_collection = []
         for i in range(number_of_ants):
-            ant_collection.append(Ant(self.model, pos))
+            ant_collection.append(Ant(model=self.model, pos=pos, visible=False))
 
         return ant_collection
 
@@ -44,12 +44,13 @@ class AntCollection:
         ant_img = pygame.transform.scale(self.ant_image, (true_img_size, true_img_size))
         red_ant_img = pygame.transform.scale(self.red_ant_image, (true_img_size, true_img_size))
         for ant in self.ant_collection:
-            if not ant.food_loaded:
-                image_rect = red_ant_img.get_rect(center=ant.get_absolute_position_of_ant())
-                screen.blit(red_ant_img, image_rect)
-            else:
-                image_rect = ant_img.get_rect(center=ant.get_absolute_position_of_ant())
-                screen.blit(ant_img, image_rect)
+            if ant.get_visibility():
+                if not ant.food_loaded:
+                    image_rect = red_ant_img.get_rect(center=ant.get_absolute_position_of_ant())
+                    screen.blit(red_ant_img, image_rect)
+                else:
+                    image_rect = ant_img.get_rect(center=ant.get_absolute_position_of_ant())
+                    screen.blit(ant_img, image_rect)
 
     def spawnAnts(self):
         spawnable_positions_copy = list(self.spawnable_positions)
@@ -62,7 +63,7 @@ class AntCollection:
             ant.set_position(random_spawnable_position)
             ant.set_visible()
 
-            time.sleep(0.1)
+            time.sleep(0.05)
 
     def start_spawning(self):
         thread = threading.Thread(target=self.spawnAnts, daemon=True)

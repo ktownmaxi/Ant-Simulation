@@ -10,7 +10,7 @@ from src.helpers import threeToThreeMatrixToRelativeVector
 
 class Ant(Entity):
     def __init__(self, model: Type[AllPurposeModel],
-                 visible=False, pos=(0, 0), turn_cycle_active=True):
+                 visible=False, pos=(0, 0), turn_cycle_active=False):
         super().__init__(model, pos)
         self.visible = visible
         self.food_loaded = False
@@ -22,7 +22,6 @@ class Ant(Entity):
 
     def move_relative(self, pos_change):
         new_pos = self.move_get_absolute_vector_after_relative_move(pos_change)
-        print(new_pos)
         if self.is_valid_cell(new_pos):
             self.pos = new_pos
 
@@ -75,6 +74,7 @@ class Ant(Entity):
             time.sleep(0.1)
 
     def start_turn_cycle(self):
+        self.turn_cycle_active = True
         self.turn_cycle = threading.Thread(target=self.next_turn, daemon=True)
         self.turn_cycle.start()
 
