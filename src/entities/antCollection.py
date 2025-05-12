@@ -24,7 +24,7 @@ class AntCollection:
         self.ant_image, self.red_ant_image = self.load_assets()
 
     def load_assets(self):
-        ant_path, red_ant_path = os.path.join("src", "assets", "ant.png"), os.path.join("src", "assets", "red_ant.png")
+        ant_path, red_ant_path = os.path.join("src", "assets", "green_ant.png"), os.path.join("src", "assets", "red_ant.png")
         ant_img = pygame.image.load(ant_path).convert_alpha()
         red_ant_path = pygame.image.load(red_ant_path).convert_alpha()
         return ant_img, red_ant_path
@@ -44,7 +44,7 @@ class AntCollection:
         ant_img = pygame.transform.scale(self.ant_image, (true_img_size, true_img_size))
         red_ant_img = pygame.transform.scale(self.red_ant_image, (true_img_size, true_img_size))
         for ant in self.ant_collection:
-            if ant.food_loaded:
+            if not ant.food_loaded:
                 image_rect = red_ant_img.get_rect(center=ant.get_absolute_position_of_ant())
                 screen.blit(red_ant_img, image_rect)
             else:
