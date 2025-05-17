@@ -78,15 +78,19 @@ while True:
                                                model.colony_pos,
                                                model.get_colony_border(model.colony_pos, colony_radius))
                 ant_collection.start_spawning()
+                ui.stopwatch.start()
 
             if event.key == pygame.K_g:
                 model.mark_food(pygame.mouse.get_pos(), food_radius)
 
     screen.fill(bg_color)
     model.draw(screen)
-    ui.draw(screen, int(clock.get_fps()))
     if ant_collection is not None:
         ant_collection.render(screen)
+        ui.draw(screen, int(clock.get_fps()), ant_collection.get_spawned_ants())
+    else:
+
+        ui.draw(screen, int(clock.get_fps()), None)
     pygame.display.flip()
 
     clock.tick(max_fps)
